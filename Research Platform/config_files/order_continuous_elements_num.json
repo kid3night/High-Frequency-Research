@@ -1,0 +1,20 @@
+{
+	"import_universe": 1, 
+	"universe_file_name": "r'F:/TANG_NEW/000905weightnextday20180816.xls'", 
+	"self_specified_universe": null,  
+	"universe_name": "r'test_500_Log'", 
+	"test_result_save_path": "r'F:/Test_Out_Put'", 
+	"feature_file_name": "r'decay_features'", 
+	"feature_name": "r'order_continuous_elements_num'", 
+	"test_time_start": 20180601, 
+	"test_time_end": 20180801, 
+	"not_plot_pnl": 1, 
+	"multi_process_feature": 5,  
+	"multi_process_result": 3,   
+	"feature_params": {"nperiod":[3, 5, 8, 10, 13, 16, 24, 30, 40, 50, 60, 70, 80, 90, 100]}, 
+	"feature_type": ["order"],
+	"each_type_data_need": {"order":["FunctionCode"]}, 
+	"generated_feature_h5_path": null,  
+	"new_result_subfolder_name": "r'result_no_pnl'",  
+	"operation_type": "r'full_backtest'" 
+}

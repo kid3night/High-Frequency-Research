@@ -1,0 +1,474 @@
+######################
+Transaction_ACD
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last, N1) (在成交价格中, 以N1长度的移动窗口取数据, 以数据的最后一个数据点作为当前的CLOSE)
+LC = REF(CLOSE, 1)  REF(x, n) 等价于 x.shift(n), 即将序列向后错位移动N
+DIF = CLOSE-IF(CLOSE>LC,MIN(LOW,LC),MAX(HIGH,LC))    IF(condition, v1, v2)   如果condition满足则返回v1, 否则返回v2
+ACD = SUM(IF(CLOSE=LC, 0, DIF), N2)  (SUM(X, N) 以N的移动窗口个在X中取数据, 返回移动窗口中数值的sum)
+result = (ACD - MA(ACD, N2)) / STD(ACD, N2)  移动标准化ACD后作为最终输出
+
+
+######################
+Transaction_UOS
+
+parameters:
+
+N1, N2, N3
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+LC = REF(CLOSE, 1)
+TH = MAX(HIGH, LC)
+TL = MIN(LOW, LC)
+ACC1 = SUM(CLOSE-TL,N1)/SUM(TH-TL,N1)
+ACC2 = SUM(CLOSE-TL,N2)/SUM(TH-TL,N2)
+ACC3 = SUM(CLOSE-TL,N3)/SUM(TH-TL,N3)
+UOS = (ACC1 * N2 * N3 + ACC2 * N1 * N3 + ACC3 * N1 * N2) * 100 / (N1 * N2 + N1 * N3 + N2 * N3)
+
+
+######################
+Transaction_VR
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last)
+VOL = rolling_time(Transaction_Price, SUM)
+
+TH = SUM(IF(CLOSE>REF(CLOSE,1),VOL,0),N1)
+TL = SUM(IF(CLOSE<REF(CLOSE,1),VOL,0),N1)
+TQ = SUM(IF(CLOSE=REF(CLOSE,1),VOL,0),N1)
+VR = 100*(TH*2+TQ)/(TL*2+TQ)
+MAVR = MA(VR,N2)
+Result = VR - MAVR
+
+
+######################
+Transaction_WAD
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last)
+VOL = rolling_time(Transaction_Price, SUM)
+
+MIDA = CLOSE-MIN(REF(CLOSE,1),LOW)
+MIDB = IF(CLOSE<REF(CLOSE,1),CLOSE-MAX(REF(CLOSE,1),HIGH),0)
+WAD = SUM(IF(CLOSE>REF(CLOSE,1),MIDA,MIDB),N2)
+MAWAD = MA(WAD, N2)
+Result = WAD - MAWAD
+
+
+######################
+Transaction_DMI_no_abs
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+HD = HIGH-REF(HIGH,1)
+LC = REF(CLOSE, 1)
+LD  = REF(LOW,1)-LOW
+DMP = SUM(IF(HD>0&&HD>LD,HD,0),N1)
+DMM = SUM(IF(LD>0&&LD>HD,LD,0),N1)
+PDI = DMP * 100 / MTR
+MDI = DMM * 100 / MTR
+ADX_ = (MDI - PDI) / (MDI + PDI)
+Result = MA(ADX, N2)
+
+
+######################
+Transaction_RSV
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+HHV = rolling_time(HIGH, MAX, N2)
+LLV = rolling_time(LOW, MIN, N2)
+Result = (CLOSE - LLV) / (HHV - LLV) *100
+
+
+######################
+Tran_Price_Change_Vol
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+OPEN = rolling_time(Transaction_Price, First, N1)
+Sign_change = sign(CLOSE - OPEN)
+VOL = rolling_time(Transaction_VOL, SUM, N1)
+Signed_VOL = Sign_change * VOL
+Result = (Signed_VOL - MA(Signed_VOL, N2)) / STD(Signed_VOL, N2)
+
+
+######################
+Mid_Change_Origin
+
+parameters:
+
+N1
+
+mid_change_percent = tick['Mid'].pct_change(1)
+Vol_Ask_Bid = BidVol1 + AskVol1
+CLOSE = tick['close']
+Result = MA(CLOSE * Vol_Ask_Bid * mid_change_percent, N1)
+
+
+######################
+VRSI
+
+parameters:
+
+N1, N2
+
+Vol = tick['TransactionVol']
+Diff_Vol = Vol.diff(N1)
+
+num = IF(Diff_Vol > 0, Diff_Vol, 0)
+num = EMA(num, N2)
+denom = ABS(Diff_Vol)
+denom = EMA(denom, N2)
+Result = num / denom
+
+
+######################
+RSI_TA
+
+parameters:
+
+N1, N2
+
+Mid = tick['Mid']
+Diff_Mid = Mid.diff(N1)
+
+num = IF(Diff_Vol > 0, Diff_Vol, 0)
+num = EMA(num, N2)
+denom = ABS(Diff_Vol)
+denom = EMA(denom, N2)
+Result = num / denom
+
+
+######################
+BIAS
+
+parameters:
+
+N1
+
+Mid = tick['Mid']
+
+Result = (Mid-MA(Mid,N1))/MA(Mid,N1) * 100
+
+
+######################
+Transaction_CYM
+
+parameters:
+
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+VOL = rolling_time(Transaction_Price, SUM)
+Var = (2 * CLOSE - HIGH - LOW) / (HIGH - LOW) * VOL
+Var = MAX(Var, 0)
+MAVar = MA(Var, N2)
+RES = Var - MAVar
+Result = (RES - MA(RES, N2)) / (Max(RES, N2) - Min(RES, N2))
+
+
+######################
+Ask_Bid_CYS
+
+parameters:
+
+N1
+
+tran_Vol = tick['TransactionVol']
+tran_Amount = tick['TransactionAmount']
+Mid = tick['Mid']
+Res = EMA(tran_Amount, N1) / EMA(tran_Vol, N1) * 10000
+Result = (Mid - Res) / Res * 100
+
+
+######################
+Order_Average_Order (平均两个相同单子之间间隔几个其他单子)
+
+parameters:
+
+N1
+
+Long_Orders = Order_data['Long_Orders']
+Short_Orders = Order_data['Short_Orders']
+average_long = Long_Orders.index.diff(1).mean()
+average_short = short_Orders.index.diff(1).mean()
+Result = average_long - average_short
+
+
+######################
+Transaction_Average_Order (平均两个相同单子之间间隔几个其他单子)
+
+parameters:
+
+N1
+
+Long_Transactions = Transaction_data['Long_Transactions']
+Short_Transactions = Transaction_data['Short_Transactions']
+average_long = Long_Transactions.index.diff(1).mean()
+average_short = short_Transactions.index.diff(1).mean()
+Result = average_long - average_short
+
+
+######################
+Transaction_CHO
+
+parameters:
+
+N1, N2, N3, N4
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+VOL = rolling_time(Transaction_Price, SUM, N1)
+MID = rolling_time(VOL*(2*CLOSE-HIGH-LOW)/(HIGH+LOW), SUM, N2)
+CHO = MA(MID,N3)-MA(MID,N2)
+Result =(CHO - MA(CHO, N4)) / STD(CHO, N4)
+
+
+######################
+Ask_Bid_1_New
+
+parameters:
+
+N1
+
+Bid_part = rolling_time(tick['BidVol1~10'], SUM, N1)
+Ask_part = rolling_time(tick['AskVol1~10'], SUM, N1)
+DIFF = Bid_part - Ask_part
+Max_point[t] = Max(DIFF[t - N1:t])
+Min_point[t] = Min(DIFF[t - N1:t])
+Result = sign(DIFF[t] - DIFF[t - N1]) * (Max_point[t] - Min_point[t]) / (Max_point[t] + Min_point[t])
+
+
+######################
+Ask_Bid_1_New2
+
+parameters:
+
+N1
+
+Bid_part = rolling_time(tick['BidVol1~10'], SUM, N1)
+Ask_part = rolling_time(tick['AskVol1~10'], SUM, N1)
+DIFF = Bid_part - Ask_part
+MA_DIFF = MA(DIFF, N1)
+Result = ABS(DIFF / MA_DIFF - 1)
+
+
+######################
+Ask_Bid_Sum_Vol_decay
+
+parameters:
+N1
+
+Bid_part = SUM(tick['BidVol1~10'])
+Ask_part = SUM(tick['AskVol1~10'])
+Result = rolling_time((Bid_part - Ask_part) / (Bid_part + Ask_part, SUM, N1)
+
+
+######################
+Order_Direction_Amount_decay
+
+parameters:
+N1
+
+Bid_order_Amount = rolling_time(Bid_orders, SUM, N1)
+Ask_order_Amount = rolling_time(Ask_orders, SUM, N1)
+Result = rolling_time((Bid_order_Amount - Ask_order_Amount) / (Bid_order_Amount + Ask_order_Amount, SUM, N1)
+
+
+######################
+Transaction_Net_DIFF
+
+parameters:
+N1
+
+Bid_Transaction_Amount = rolling_time(Bid_Transactions, SUM, N1)
+Ask_Transaction_Amount = rolling_time(Ask_Transactions, SUM, N1)
+Result = rolling_time((Bid_Transaction_Amount - Ask_Transaction_Amount) / (Bid_Transaction_Amount + Ask_Transaction_Amount, SUM, N1)
+
+
+######################
+Transaction_Net_Vol
+
+parameters:
+N1
+
+Bid_Transaction_Vol = rolling_time(Bid_Transactions, SUM, N1)
+Ask_Transaction_Vol = rolling_time(Ask_Transactions, SUM, N1)
+Result = rolling_time((Bid_Transaction_Vol - Ask_Transaction_Vol) / (Bid_Transaction_Vol + Ask_Transaction_Vol, SUM, N1)
+
+######################
+Tran_Type_Num_Diff
+
+parameters:
+N1
+
+Bid_Transaction_Time = rolling_time(Bid_Transactions_Time, SUM, N1)
+Ask_Transaction_Time = rolling_time(Ask_Transactions_Time, SUM, N1)
+Result = rolling_time((Bid_Transaction_Time - Ask_Transaction_Time) / (Bid_Transaction_Time + Ask_Transaction_Time, SUM, N1)
+
+
+######################
+Transaction_Order_Percent_Diff
+
+parameters:
+N1
+
+Bid_Transaction_Amount = rolling_time(Bid_Transactions, SUM, N1)
+Ask_Transaction_Amount = rolling_time(Ask_Transactions, SUM, N1)
+Bid_order_Amount = rolling_time(Bid_orders, SUM, N1)
+Ask_order_Amount = rolling_time(Ask_orders, SUM, N1)
+Result = Bid_Transaction_Amount / Bid_order_Amount - Ask_Transaction_Amount / Ask_order_Amount
+
+
+######################
+Transaction_Order_Time_Percent_Diff
+
+parameters:
+N1
+
+Bid_Transaction_Amount_Times = rolling_time(Bid_Transactions_Times, SUM, N1)
+Ask_Transaction_Amount_Times = rolling_time(Ask_Transactions_Times, SUM, N1)
+Bid_order_Amount_Times = rolling_time(Bid_orders_Times, SUM, N1)
+Ask_order_Amount_Times = rolling_time(Ask_orders_Times, SUM, N1)
+Result = Bid_Transaction_Amount / Bid_order_Amount - Ask_Transaction_Amount / Ask_order_Amount
+
+
+######################
+Transaction_EMV
+
+parameters:
+N1, N2, N3
+
+VOL = rolling_time(Transaction_Price, SUM, N1)
+MA_Vol = MA(VOL, N2)
+Quotient = MA_Vol / VOL
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+HIGH_LOW_Add = HIGH + LOW
+HIGH_LOW_Minus = HIGH - LOW
+HIGH_LOW_Add_percent_change[t] = (HIGH_LOW_Add[t] - HIGH_LOW_Add[t - N1]) / HIGH_LOW_Add[t - N1]
+HIGH_LOW_Minus_MA = MA(HIGH_LOW_Minus, N2)
+EMV = HIGH_LOW_Add_percent_change * Quotient * high_low_minus / high_low_minus_MA
+MA_EMV = MA(EMV, N3)
+Result = EMV - MA_EMV
+
+
+######################
+Transaction_KDJ
+
+parameters:
+N1, N2, N3
+
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+HHV = rolling_time(HIGH, MAX, N1)
+LLV = rolling_time(LOW, MIN, N1)
+RSV = (CLOSE - LLV) / (HHV - LLV)
+K = MA(RSV, N2)
+D = MA(RSV, N3)
+Result = K * 3 - D * 2
+
+
+######################
+Ask_Bid_1_decay
+
+parameters:
+N1
+
+Bid_part = SUM(tick['BidVol1~10'])
+Ask_part = SUM(tick['AskVol1~10'])
+Vol_Percent = (Bid_part - Ask_part) / (Bid_part + Ask_part)
+Vol_Percent_change[t] = (Vol_Percent[t] - Vol_Percent[t - N1]) / Vol_Percent[t - N1]
+Result = Vol_Percent_change
+
+
+######################
+Transaction_UDL
+
+parameters:
+N1, N2, N3, N4, N5
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+MA1 = MA(CLOSE, N2)
+MA2 = MA(CLOSE, N3)
+MA3 = MA(CLOSE, N4)
+MA4 = MA(CLOSE, N5)
+UDL = (MA2 + MA3 + MA4 + MA5) / 4
+MA_UDL = MA(UDL, N2)
+Result = (UDL / MA_UDL - 1) * 100
+
+
+######################
+Transaction_Returns
+
+parameters:
+N1
+
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+OPEN = rolling_time(Transaction_Price, First, N1)
+Result = (Close / Open - 1) * 100
+
+
+######################
+Ask_Bid_AMV
+
+parameters:
+N1
+Open = tick['Open']
+Close = tick['Close']
+Mid = tick['Mid']
+Vol = tick['Vol']
+AMOV = Vol * (Open + Close) / 2
+SUM_AMOV = rolling_cal(AMOV, rolling_time, vol_sum)
+SUM_VOL = rolling_cal(Vol, rolling_time, vol_sum)
+Result = (SUM_AMOV / SUM_VOL / Mid - 1) * 100
+
+
+######################
+Transaction_AMV
+
+parameters:
+N1, N2
+
+CLOSE = rolling_time(Transaction_Price, First, N1)
+CLOSE = rolling_time(Transaction_Price, Last, N1)
+HIGH = rolling_time(Transaction_Price, MAX, N1)
+LOW = rolling_time(Transaction_Price, MIN, N1)
+AMOV = Vol * (close_series + open_series) / 2
+SUM_AMOV = rolling_cal(AMOV, rolling_time_n, vol_sum)
+SUM_VOL = rolling_cal(Vol, rolling_time_n, vol_sum)
+RES = (SUM_AMOV / SUM_VOL / Mid_High_low - 1) * 100
+
+
+

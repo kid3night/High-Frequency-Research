@@ -1,0 +1,23 @@
+{
+	"import_universe": 1, 
+	"universe_file_name": "r'F:/TANG_NEW/000905weightnextday20180816.xls'", 
+	"self_specified_universe": null,
+	"universe_name": "r'ZZ500'", 
+	"test_result_save_path": "r'F:/Test_Out_Put_PNL'", 
+	"feature_file_name": "r'feature_retest'", 
+	"feature_name": "r'Ask_Bid_Sum_Vol_decay'", 
+	"test_time_start": 20180601, 
+	"test_time_end": 20180801, 
+	"not_plot_pnl": 0, 
+	"multi_process_feature": 10,  
+	"multi_process_result": 6,   
+	"feature_params": {"nperiod":[10, 20, 40, 60, 100], "decay_factor":[0.8]},
+	"feature_type": ["tick"],   
+	"each_type_data_need": {"tick":["BidVol10", "BidVol9", "BidVol8", "BidVol7", "BidVol6",
+									"BidVol5", "BidVol4", "BidVol3", "BidVol2", "BidVol1",
+									"AskVol1", "AskVol2", "AskVol3", "AskVol4", "AskVol5",
+									"AskVol6", "AskVol7", "AskVol8", "AskVol9", "AskVol10"]}, 
+	"generated_feature_h5_path": "r'F:/Test_Out_Put_PNL/Test_Ask_Bid_Sum_Vol_decay_On_test_500_From_20180601_To_20180801'",
+	"new_result_subfolder_name": "r'result_no_pnl'",  
+	"operation_type": "r'full_backtest'" 
+}

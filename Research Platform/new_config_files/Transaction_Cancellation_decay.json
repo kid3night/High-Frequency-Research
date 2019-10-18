@@ -1,0 +1,20 @@
+{
+	"import_universe": 1, 
+	"universe_file_name": "r'F:/TANG_NEW/000905weightnextday20180816.xls'", 
+	"self_specified_universe": null,  
+	"universe_name": "r'ZZ500'", 
+	"test_result_save_path": "r'F:/Test_Out_Put_PNL'", 
+	"feature_file_name": "r'feature_retest'", 
+	"feature_name": "r'Transaction_Cancellation_decay'", 
+	"test_time_start": 20180601, 
+	"test_time_end": 20180801, 
+	"not_plot_pnl": 0, 
+	"multi_process_feature": 10,  
+	"multi_process_result": 3,   
+	"feature_params": {"nperiod":[10, 20, 40, 60, 100], "decay_factor":[0.8]},
+	"feature_type": ["transaction"],   
+	"each_type_data_need": {"transaction":["AskOrder", "BidOrder", "Volume", "FunctionCode"]}, 
+	"generated_feature_h5_path": "r'F:/Test_Out_Put_PNL/Test_Transaction_Cancellation_decay_On_test_500_Log_From_20180601_To_20180801'",  
+	"new_result_subfolder_name": "r'result_no_pnl'",  
+	"operation_type": "r'full_backtest'" 
+}

@@ -1,0 +1,21 @@
+{
+	"import_universe": 1, 
+	"universe_file_name": "r'F:/TANG_NEW/000905weightnextday20180816.xls'", 
+	"self_specified_universe": null,
+	"universe_name": "r'ZZ500_'", 
+	"test_result_save_path": "r'F:/TOPT_1101'", 
+	"feature_file_name": "r'feature_selected'", 
+	"feature_name": "r'Transaction_CYM'", 
+	"test_time_start": 20180601, 
+	"test_time_end": 20180801, 
+	"not_plot_pnl": 0, 
+	"multi_process_feature": 10,  
+	"multi_process_result": 3,   
+	"feature_params": {"nperiod":[3, 6, 9, 12, 15]},  
+	"feature_type": ["transaction"],   
+	"each_type_data_need": {"transaction":["Price", "FunctionCode", "Volume"]}, 
+	"generated_feature_h5_path": "r'F:/TOPT_1009/Test_Transaction_Net_DIFF_On_ZZ500_From_20180601_To_20180801'",
+	"generated_target_h5_path": "r'F:/TOPT_1009/Test_Transaction_Net_DIFF_On_ZZ500_From_20180601_To_20180801'",  
+	"new_result_subfolder_name": "r'new_pnl_tt'",  
+	"operation_type": "r'full_backtest'"
+}

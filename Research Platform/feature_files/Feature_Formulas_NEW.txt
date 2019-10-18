@@ -1,0 +1,153 @@
+######################
+VRSI_update
+parameters:
+
+N1, N2
+
+Vol = tick['TransactionVol']
+Close = tick['Close']
+sign_vol = np.sign(Close.diff(N1).fillna(0))
+diff_vol = (vol * sign_vol).diff(N1).fillna(0).values
+temp = iF(diff_vol != 0, diff_vol, 0)
+num = EMA(temp, N2)
+denom = EMA(ABS(diff_vol), N2)
+denom = iF((num == 0), 1, denom)
+RES = num / denom
+
+
+
+######################
+Transaction_ZLJC
+parameters:
+
+N1, N2, N3
+
+Vol = transaction['Volume']
+Prices = transaction['Price']
+CLOSE = rolling_time(Prices, Last, N1)
+HIGH = rolling_time(Prices, MAX, N1)
+LOW = rolling_time(Prices, MIN, N1)
+REF_LOW = rolling_time(Prices, First, N1) 
+VOL = rolling_time(Vol, SUM, N1)
+VAR1 = (CLOSE + HIGH + LOW) / 3
+VAR2 = (VAR1 * 2 - REF_LOW - HIGH) * VOL / 10000 / (HIGH - LOW)
+VAR3 = rolling_time(series_clean, mean, N2)
+rolling_mean = rolling_time(VAR3, mean, N1)
+rolling_std = rolling_time(VAR3, std, N1)
+RES = (VAR3 - rolling_mean) / rolling_std
+
+
+######################
+Transaction_Corr_Adjusted_Returns
+parameters:
+
+N1
+
+Prices = transaction['Price']
+Vol = transaction['Volume']
+VOL = rolling_time(Vol, SUM, N1)
+LC = rolling_time(Prices,  lc_, N1)
+roll_corr_abs = rolling_corr(VOL, Prices, N1).abs()   ## 这里的rolling_corr 是移动窗口对VOL和Prices求correlation作为当前value
+RES = ((Prices / LC) - 1) * 100 * roll_corr_abs
+
+
+######################
+Transaction_delta_VOL_Adjusted_Returns
+parameters:
+
+N1
+
+Prices = transaction['Price']
+Vol = transaction['Volume']
+VOL = rolling_time(Vol, SUM, N1)
+VOL_LC = rolling_time(VOL,  lc_, N1)
+sign_delta_vol = sign(VOL - VOL_LC)
+RES = ((Prices / LC) - 1) * 100 * sign_delta_vol
+
+
+######################
+Transaction_alpha101_25
+parameters:
+
+N1, N2, N3
+
+Vol = transaction['Volume']
+Prices = transaction['Price']
+CLOSE = rolling_time(Prices, Last, N1)
+HIGH = rolling_time(Prices, MAX, N1)
+LOW = rolling_time(Prices, MIN, N1)
+
+CLOSE = price_series
+HIGH = rolling_cal(CLOSE, N1, high_)
+close_t_vol = CLOSE * Vol
+VOL = rolling_time(Vol, SUM, N1)
+VWAP = rolling_time(close_t_vol, SUM, N1) / VOL
+ADV = rolling_time(Vol, SUM, N2)
+LC = rolling_cal(CLOSE, N1, lc_)
+result = series_clean(((CLOSE / LC) - 1) * 100)
+temp_result = ADV * result * VWAP * (HIGH - CLOSE)
+rolling_mean = rolling_time(temp_result, mean, N1)
+rolling_std = rolling_time(temp_result, std, N1)
+RES = (temp_result - rolling_mean) / rolling_std
+
+
+######################
+Transaction_alpha101_32
+parameters:
+
+N1, N2, N3
+
+Vol = transaction['Volume']
+Prices = transaction['Price']
+CLOSE = rolling_time(Prices, Last, N1)
+HIGH = rolling_time(Prices, MAX, N1)
+LOW = rolling_time(Prices, MIN, N1)
+Mean_CLOSE = rolling_time(Prices, Mean, N2)
+p1 = (Mean_CLOSE - CLOSE) / Mean_CLOSE
+close_t_vol = CLOSE * Vol
+VOL = rolling_time(Vol, SUM, N1)
+VWAP = rolling_time(close_t_vol, SUM, N1) / VOL
+LC = rolling_cal(CLOSE, N1, lc_)
+roll_corr = rolling_corr(VWAP, LC, N2)  ## 这里的rolling_corr 是移动窗口对VWAP和LC求correlation作为当前value
+Mean_roll_corr = rolling_time(roll_corr, Mean, N2)
+p2 = roll_corr / mean_roll_corr
+RES = p1 + p2
+
+
+######################
+Transaction_alpha101_61
+parameters:
+
+N1, N2, N3
+
+Vol = transaction['Volume']
+Prices = transaction['Price']
+CLOSE = rolling_time(Prices, Last, N1)
+HIGH = rolling_time(Prices, MAX, N1)
+LOW = rolling_time(Prices, MIN, N1)
+Mean_CLOSE = rolling_time(Prices, Mean, N2)
+p1 = (Mean_CLOSE - CLOSE) / Mean_CLOSE
+close_t_vol = CLOSE * Vol
+VOL = rolling_time(Vol, SUM, N1)
+VWAP = rolling_time(close_t_vol, SUM, N1) / VOL
+ts_VWAP = rolling_time(VWAP, MIN, N1)
+diff_VWAP = VWAP - ts_VWAP
+ADV = rolling_time(Vol, SUM, N2)
+roll_corr = rolling_corr(VWAP, ADV, rolling_time_n2)
+
+temp_result = diff_VWAP * roll_corr
+rolling_mean = rolling_time(temp_result, mean, N1)
+rolling_std = rolling_time(temp_result, std, N1)
+RES = ((temp_result - rolling_mean) / rolling_std).abs()
+
+
+######################
+Transaction_price_skewness
+parameters:
+
+N1
+
+Prices = transaction['Price']
+RES = rolling_time(Prices, skew, N1)  ## 这里的skew使用的是pandas的skew函数 求rolling window中的数据的偏度
+
+

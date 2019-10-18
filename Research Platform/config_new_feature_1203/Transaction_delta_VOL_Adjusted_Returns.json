@@ -1,0 +1,21 @@
+{
+	"import_universe": 1, 
+	"universe_file_name": "r'F:/TANG_NEW/universe_ZZ500.csv'", 
+	"self_specified_universe": null,
+	"universe_name": "r'New500'", 
+	"test_result_save_path": "r'E:/TOPT_1203_Train_add'", 
+	"feature_file_name": "r'new_feature_exploit_1203modi'", 
+	"feature_name": "r'Transaction_delta_VOL_Adjusted_Returns'", 
+	"test_time_start": 20180601, 
+	"test_time_end": 20180801, 
+	"not_plot_pnl": 0, 
+	"multi_process_feature": 10,  
+	"multi_process_result": 3,   
+	"feature_params": {"nperiod":[3, 5, 8, 12, 15]},  
+	"feature_type": ["transaction"],   
+	"each_type_data_need": {"transaction":["Price", "FunctionCode", "Volume"]}, 
+	"generated_feature_h5_path": "r'E:/TOPT_1203_Train_add/Test_Transaction_delta_VOL_Adjusted_Returns_On_New500_From_20180601_To_20180801'",
+	"generated_target_h5_path": "r'E:/TOPT_1203_Train_add/Test_Transaction_delta_VOL_Adjusted_Returns_On_New500_From_20180601_To_20180801'",  
+	"new_result_subfolder_name": "r'pnl_tt'",  
+	"operation_type": "r'bt'" 
+}
